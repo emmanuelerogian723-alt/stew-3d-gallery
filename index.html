@@ -1,0 +1,26 @@
+<!doctype html><html><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Stew 3D Engine — evidence gallery</title>
+<style>body{margin:0;background:#0a0e14;font-family:system-ui;color:#eef2f8;overflow:hidden}#h{position:fixed;top:14px;left:16px;z-index:5}#h b{font-size:16px}#h p{margin:2px 0 0;color:#8b949e;font-size:11.5px}#btns{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);display:flex;gap:10px;z-index:5}#btns button{background:#11161f;border:1px solid #2fbf71;color:#eef2f8;border-radius:999px;padding:10px 20px;cursor:pointer;font-size:13px}#btns button.on{background:#2fbf71;color:#04120b;font-weight:800}#cred{position:fixed;bottom:16px;right:16px;color:#59606d;font-size:11px;z-index:5}</style>
+</head><body>
+<div id="h"><b>🍲 Stew 3D Engine — models built by Stew itself</b><p>Real geometry, exported as GLB, rendered live. Built by the same build_3d_model engine inside Stew.</p></div>
+<div id="btns"><button id=b1 class="on">🏠 House architecture</button><button id=b2>🚗 Car body + wheels</button><button id=b3>🧠 Brain + tumor</button></div>
+<div id="cred">Drag to orbit · scroll to zoom</div>
+<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/loaders/GLTFLoader.js"></script>
+<script>
+const S=new THREE.Scene();S.background=new THREE.Color(0x0a0e14);
+const C=new THREE.PerspectiveCamera(50,innerWidth/innerHeight,.1,200);C.position.set(9,7,10);
+const R=new THREE.WebGLRenderer({antialias:true});R.setSize(innerWidth,innerHeight);R.setPixelRatio(devicePixelRatio);document.body.appendChild(R.domElement);
+S.add(new THREE.AmbientLight(0xffffff,.7));const dl=new THREE.DirectionalLight(0xffffff,1.2);dl.position.set(6,10,4);S.add(dl);
+const grid=new THREE.GridHelper(20,20,0x2fbf71,0x232b38);grid.position.y=-0.02;S.add(grid);
+const L=new THREE.GLTFLoader();let G=null;
+const M={b1:"https://base44.app/api/apps/6a37c01bd442f2d055bc0d3a/files/mp/public/6a37c01bd442f2d055bc0d3a/3f10ee76e_stew-house.glb",b2:"https://base44.app/api/apps/6a37c01bd442f2d055bc0d3a/files/mp/public/6a37c01bd442f2d055bc0d3a/fe8cd735b_stew-car.glb",b3:"https://base44.app/api/apps/6a37c01bd442f2d055bc0d3a/files/mp/public/6a37c01bd442f2d055bc0d3a/24e7e0fbc_stew-brain-tumor.glb"};
+function load(id){if(G)S.remove(G);L.load(M[id],(g)=>{G=g.scene;S.add(G);C.lookAt(0,1.5,0)})}
+document.getElementById('b1').onclick=function(){load('b1');on(1)};document.getElementById('b2').onclick=function(){load('b2');on(2)};document.getElementById('b3').onclick=function(){load('b3');on(3)};
+function on(n){['b1','b2','b3'].forEach((x,i)=>document.getElementById(x).classList.toggle('on',i===n-1))}
+load('b1');
+let px=0,py=0,d=false;addEventListener('mousedown',e=>{d=true;px=e.clientX;py=e.clientY});addEventListener('mouseup',()=>d=false);
+addEventListener('mousemove',e=>{if(!d)return;const r=Math.hypot(C.position.x,C.position.z),a=Math.atan2(C.position.x,C.position.z)+(e.clientX-px)*.008;C.position.x=r*Math.sin(a);C.position.z=r*Math.cos(a);C.position.y=Math.max(1.2,C.position.y-(e.clientY-py)*.03);px=e.clientX;py=e.clientY;C.lookAt(0,1.5,0)});
+addEventListener('wheel',e=>C.position.multiplyScalar(Math.exp(e.deltaY*.001)));
+addEventListener('resize',()=>{C.aspect=innerWidth/innerHeight;C.updateProjectionMatrix();R.setSize(innerWidth,innerHeight)});
+(function t(){requestAnimationFrame(t);R.render(S,C)})();
+</script></body></html>
